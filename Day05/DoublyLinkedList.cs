@@ -21,8 +21,6 @@ namespace CSC395_Module3
             myList.Insert(45); // O(1)
             myList.Insert(300); // O(1)
 
-            Console.WriteLine(myList.last.value); // O(1)
-
             myList.PrintList(); // O(n)
 
             myList.Delete(14); // O(1)
@@ -31,9 +29,26 @@ namespace CSC395_Module3
 
             myList.PrintList(); // O(n)
 
-            Console.WriteLine(myList.last.value); // O(1)
+            bool answer = myList.IsPalindrome(); // O(n)
+            Console.WriteLine(); // O(1)
+            Console.WriteLine($"Is the list a palindrome? {answer}"); // O(1)
 
             myList.printReverse(); // O(n)
+
+            DoublyLinkedList myList2 = new DoublyLinkedList(); // O(1)
+            myList2.AddFirst(1); // O(1)
+            myList2.AddFirst(2); // O(1)
+            myList2.AddFirst(4); // O(1)
+            myList2.AddFirst(6); // O(1)
+            myList2.AddLast(2); // O(1)
+            myList2.AddLast(4); // O(1)
+            myList2.AddLast(6); // O(1)
+
+            myList2.PrintList(); // O(n)
+
+            answer = myList2.IsPalindrome(); // O(n)
+            Console.WriteLine(); // O(1)
+            Console.WriteLine($"Is the list a palindrome? {answer}"); // O(1)
 
             Console.ReadLine(); // O(1)?
         }
@@ -113,7 +128,7 @@ namespace CSC395_Module3
             {
                 Node newNode = new Node(val); // O(1)
                 Node curr = first; // O(1)
-               
+
                 while (curr.next != null && curr.next.value < val) // O(n)
                     curr = curr.next; // O(1)
 
@@ -212,6 +227,30 @@ namespace CSC395_Module3
                 }
             }
         }
+        // The function checks if the string is empty. If not, it creates two movable pointers, one at either end of the list. It compares them and
+        // if they're equivalent it moves the pointers towards the center and compares them again. If it makes it to the 
+        public bool IsPalindrome() // O(n)
+        {
+            if (IsEmpty()) // O(1)
+                Console.WriteLine("the list is empty!!!"); // O(1)
+
+            bool answer = true; // O(1)
+
+            Node comparer1 = first; // O(1)
+            Node comparer2 = last; // O(1)
+
+            while (comparer1 != comparer2 && comparer1.prev != comparer2) // O(n)
+            {
+                if (comparer1.value != comparer2.value) // O(1)
+                {
+                    answer = false; // O(1)
+                    break; // O(1)
+                }
+                comparer1 = comparer1.next; // O(1)
+                comparer2 = comparer2.prev; // O(1)
+            }
+            return answer; // O(1)
+        }
         // A default constructor.
         public DoublyLinkedList() // O(1)
         {
@@ -220,3 +259,4 @@ namespace CSC395_Module3
         }
     }
 }
+
