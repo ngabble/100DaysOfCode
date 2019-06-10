@@ -1,0 +1,170 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Collections;
+
+namespace HomeWork3
+{
+    class Program
+    {
+        public static void Main() // O(n)
+        {
+            // I create a queue, populate it, print it, reverse it, print it again, call the File.IO class and method, and show off the Dequeue() method. 
+            MyQueue<string> queue = new MyQueue<string>(); // O(1)
+            queue.Enqueue("First"); // O(1)
+            queue.Enqueue("Second"); // O(1)
+            queue.Enqueue("Third"); // O(1)
+            queue.Enqueue("Fourth"); // O(1)
+            queue.Enqueue("Fifth"); // O(1)
+
+            queue.Print(); // O(n)
+            queue.Reverse(); // O(n)
+            queue.Print(); // O(n)
+
+            FileReadWrite newOutput = new FileReadWrite();
+            newOutput.ReverseFile("input.txt");
+
+            queue.Dequeue(); // O(n)
+            queue.Dequeue(); // O(n)
+            queue.Dequeue(); // O(n)
+            queue.Dequeue(); // O(n)
+
+            queue.Print(); // O(n)
+
+            Console.WriteLine("Press any key to continue."); // O(1)
+            Console.ReadLine();
+        }
+    }
+    // The MyQueue<T> class is a generic queue created using 2 stacks and immplimenting IEnumerable.
+    class MyQueue<T> : IEnumerable<T>
+    {
+        // The 2 stacks that give MyQueue it's functionality.
+        Stack<T> stack1 = new Stack<T>(); // O(1)
+        Stack<T> stack2 = new Stack<T>(); // O(1)
+        // Constructor.
+        public MyQueue() // O(1)
+        {
+
+        }
+        // Enqueue loads a value into to the queue, which, at rest, is stored in stack1 with the first value in the queue stored at the bottom of the stack. 
+        public void Enqueue(T value) // O(1)
+        {
+            stack1.Push(value); // O(1)
+        }
+        // Dequeue pushes everything out of stack1 into stack2, uncovering the first value of the queue and pops it off of stack2, then loads everything back into stack1. 
+        public T Dequeue() // O(n)
+        {
+            while (stack1.Count != 0) // O(n)
+                stack2.Push(stack1.Pop()); // O(n)
+
+            T ret = stack2.Pop(); // O(1)
+
+            while (stack2.Count != 0)  // O(n)
+                stack1.Push(stack2.Pop()); // O(n)
+
+            return ret; // O(1)
+        }
+        // The Print() method prints each item in the queue in queue order because of the way IEnumerable is defined here.
+        // This might have been acheived by calling foreach on stack1, or moving everything into stack2 and calling a loop in it.
+        public void Print() // O(n)
+        {
+            foreach (T item in this) // O(n)
+            {
+                Console.WriteLine(item); // O(n)
+            }
+            Console.WriteLine(); // O(1)
+        }
+        // I created a Count() method to make my Reverse() method easier to define. It's just a masking of the Stack<T>.Count() method. 
+        public int Count() // O(1)
+        {
+            return stack1.Count(); // O(1)
+        }
+        // The assignment called for a Reverse() method built from an empty stack and a queue. 
+        // If I hadn't had that constraint I might have passed the information between three stacks and not created the Count() method.
+        // Instead I call the information out of the stack which does pass the information between three stacks less explicitly.
+        public void Reverse() // O(n)
+        {
+            Stack<T> newStack = new Stack<T>(); // O(1)
+
+            while (this.Count() != 0) // O(n)
+                newStack.Push(this.Dequeue()); // O(n)
+
+            while (newStack.Count != 0) // O(n)
+                this.Enqueue(newStack.Pop()); // O(n)
+        }
+        // This pushes everything into stack2 and yields it as it places it back into stack1.
+        public IEnumerator<T> GetEnumerator()
+        {
+            while (stack1.Count != 0) // O(n)
+                stack2.Push(stack1.Pop()); // O(n)
+
+            T ret; // O(1)
+            while (stack2.Count != 0) // O(n)
+            {
+                ret = stack2.Peek(); // O(1)
+                stack1.Push(stack2.Pop()); // O(1)
+                yield return ret; // O(1)
+            }
+        }
+        // I honestly don't know what this does, but I have to impliment it, so...
+        IEnumerator IEnumerable.GetEnumerator() // O(1)
+        {
+            return this.GetEnumerator(); // O(1)
+        }
+    }
+    // An encapsulating class for my File.IO problem.
+    class FileReadWrite
+    {
+        // Constructor.
+        public FileReadWrite() // O(1)
+        {
+        }
+        // The method to reverse the text of a file uses a stack and pops the lines of the input into an output file in reverse order.
+        public void ReverseFile(string path) // O(n)
+        {
+            Stack<string> newStack = new Stack<string>(); // O(1)
+
+            try
+            {
+                using (StreamReader sr = new StreamReader(path)) // O(n)
+                {
+                    string line; // O(1)
+
+                    while ((line = sr.ReadLine()) != null) // O(n)
+                        newStack.Push(line); // O(n)
+                }
+            }
+            catch (Exception e) // O(1)
+            {
+                Console.WriteLine("Where's that file, yo?"); // O(1)
+                Console.WriteLine(e.Message); // O(1)
+            }
+
+            using (StreamWriter writer = File.CreateText("output.txt")) // O(n)
+            {
+                while (newStack.Count != 0) // O(n)
+                    writer.WriteLine(newStack.Pop()); // O(n)
+            }
+        }
+    }
+
+    // A programming artifact. I later decided to include this inside the MyQueue class.
+    //class Reverse
+    //{
+    //    public static void ReverseQueue(MyQueue<String> queue)
+    //    {
+    //        if (queue.Count != 0)
+    //        {
+    //            Stack<string> newStack = new Stack<string>();
+
+    //            while (queue.Count != 0)
+    //                newStack.Push(queue.Dequeue());
+
+    //            while (newStack.Count != 0)
+    //                queue.Enqueue(newStack.Pop());
+    //        }
+    //    }
+    //}
+}
